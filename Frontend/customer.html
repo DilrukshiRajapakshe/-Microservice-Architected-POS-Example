@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Point Of Sales | Dashboard</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <!-- Bootstrap 3.3.7 -->
+  <link rel="stylesheet" href="../../bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+  <!-- Google Font -->
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap.min.css">
+
+
+</head>
+
+<body class="hold-transition skin-blue sidebar-mini">
+  <div class="wrapper">
+
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper" style="margin:30px;">
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <h1>
+          New Customer
+          <small>Control panel</small>
+        </h1>
+      </section>
+
+      <!-- Main content -->
+      <section class="content">
+        <div class="row">
+          <!-- left column -->
+          <div class="col-md-4">
+            <!-- general form elements -->
+            <div class="box box-primary">
+              <div class="box-header with-border">
+                <h3 class="box-title">Add Customer</h3>
+              </div>
+              <!-- /.box-header -->
+              <!-- form start -->
+              <form role="form">
+                <div class="box-body">
+                  <div class="box-header">
+                    <button type="submit" class="btn btn-primary">New Customer</button>
+                  </div>
+                  <div class="form-group">
+                    <label>Customer ID</label>
+                    <input type="text" class="form-control" id="txtCustomerId" placeholder="Enter Customer ID">
+                  </div>
+                  <div class="form-group">
+                    <label>Customer Name</label>
+                    <input type="text" class="form-control" id="txtCustomerName" placeholder="Enter Customer Name">
+                  </div>
+                  <div class="form-group">
+                    <label for="txtCustomerAddress">Customer Address</label>
+                    <input type="text" class="form-control" id="txtCustomerAddress"
+                      placeholder="Enter Customer Address">
+                  </div>
+                </div>
+                <!-- /.box-body -->
+
+                <div class="box-footer" style="text-align: left">
+                  <button type="button" class="btn btn-success" id="btnSave" style="margin-left:30px">ADD</button>
+                  <button type="button" class="btn btn-success" id="btnUpdate" style="margin-left:30px">Update</button>
+                  <button type="reset" class="btn btn-success" style="margin-left:30px">Clear</button>
+                </div>
+              </form>
+            </div>
+          </div>
+          <div class="col-md-8">
+            <div class="box">
+              <div class="box-header">
+                <h3 class="box-title">Customer Information</h3>
+              </div>
+              <!-- /.box-header -->
+              <div class="box-body">
+                <table id="tblCustomers" class="table table-bordered table-hover">
+                  <thead>
+                    <tr>
+                      <th>Customer ID</th>
+                      <th>Customer Name</th>
+                      <th>Customer Address</th>
+                      <th>Remove</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <th>Customer ID</th>
+                      <th>Customer Name</th>
+                      <th>Customer Address</th>
+                      <th>Remove</th>
+                    </tr>
+                  </tfoot>
+                </table>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+      <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+ <footer class="main-footer">
+        <!-- Default to the left -->
+        <p style="text-align: center"><strong>Copyright &copy; SLIIT 2019</strong> | dilrukshi.rajapakshe@gmial.com</p>
+      </footer>
+  </div>
+  <!-- ./wrapper -->
+
+  <!-- jQuery 3 -->
+  <script src="bower_components/jquery/dist/jquery.min.js"></script>
+  <!-- jQuery UI 1.11.4 -->
+  <script src="bower_components/jquery-ui/jquery-ui.min.js"></script>
+  <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+  <script>
+    $.widget.bridge('uibutton', $.ui.button);
+  </script>
+  <!-- Bootstrap 3.3.7 -->
+  <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+  <script src="dist/js/jquery.dataTables.min.js"></script>
+  <script src="dist/js/dataTables.bootstrap.min.js"></script>
+  <script>
+    var SERVER_URL = "http://localhost:8020";
+
+    $("#btnUpdate").click(function () {
+      var  a = addToValidation0();
+      var  b = addToValidation1();
+      var  c = addToValidation2();
+      var  d = vIsEmail($("#txtCustomerAddress").val());
+      if ( a && b && c && d) {
+        var customer = {
+          id: $("#txtCustomerId").val(),
+          name: $("#txtCustomerName").val(),
+          address: $("#txtCustomerAddress").val()
+        };
+
+        var ajaxConfig = {
+          method: "PUT",
+          url: SERVER_URL + "/api/v1/customers/" + $("#txtCustomerId").val(),
+          async: true,
+          contentType: "application/json",
+          data: JSON.stringify(customer)
+        }
+
+        $.ajax(ajaxConfig).done(function (response, statusText, jxhr) {
+          alert("Updated Successfully");
+          loadAllCustomers();
+          $('button[type="reset"]').trigger("click");
+        }).fail(function (jxhr, statusText, error) {
+          alert("Unable to update the customer, try again");
+          console.log(error);
+        });
+      } else {
+        alert("fill the text box");
+      }
+    });
+    $("#btnSave").click(function () {
+      var  a = addToValidation0();
+      var  b = addToValidation1();
+      var  c = addToValidation2();
+      var  d = vIsEmail($("#txtCustomerAddress").val());
+      if ( a && b && c && d) {
+        var customer = {
+          id: $("#txtCustomerId").val(),
+          name: $("#txtCustomerName").val(),
+          address: $("#txtCustomerAddress").val()
+        };
+
+        var ajaxConfig = {
+          method: "POST",
+          url: SERVER_URL + "/api/v1/customers",
+          async: true,
+          contentType: "application/json",
+          data: JSON.stringify(customer)
+        }
+
+        $.ajax(ajaxConfig).done(function (response, statusText, jxhr) {
+          alert("Added Successfully");
+          loadAllCustomers();
+          $('button[type="reset"]').trigger("click");
+        }).fail(function (jxhr, statusText, error) {
+          alert("Unable to save the customer, try again");
+          console.log(error);
+        });
+      } else {
+        alert("fill the text box");
+      }
+    });
+
+    $('button[type="reset"]').click(function () {
+      $("#tblCustomers tbody tr").removeClass("selected-row");
+      $("#txtCustomerId").attr("disabled", false);
+    });
+
+    $(document).ready(function () {
+
+      loadAllCustomers();
+
+    });
+
+    function loadAllCustomers() {
+
+      $("#tblCustomers").dataTable().fnDestroy();
+      $("#tblCustomers tbody tr").remove();
+
+      var ajaxConfig = {
+        method: "GET",
+        url: SERVER_URL + "/api/v1/customers",
+        async: true
+      };
+
+      $.ajax(ajaxConfig).done(function (customers, statusText, jxhr) {
+
+        customers.forEach(function (customer) {
+
+          var html = `<tr>
+                                <td>${customer.id}</td>
+                                <td>${customer.name}</td>
+                                <td>${customer.address}</td>
+                                <td><button type="button" class="btn btn-success delete">Delete</button></td>
+                            </tr>`;
+
+          $("#tblCustomers tbody").append(html);
+
+          $("#tblCustomers tbody tr").off("click");
+          $("#tblCustomers tbody tr").click(function () {
+            $("#tblCustomers tbody tr").removeClass("selected-row");
+            $(this).addClass("selected-row");
+
+            $("#txtCustomerId").val($(this).find("td:first-child").text());
+            $("#txtCustomerId").attr("disabled", true);
+            $("#txtCustomerName").val($(this).find("td:nth-child(2)").text());
+            $("#txtCustomerAddress").val($(this).find("td:nth-child(3)").text())
+
+          });
+
+          $("button.delete").off("click");
+          $("button.delete").click(function (eventData) {
+
+            eventData.stopPropagation();
+
+            var row = $(this).parents("tr");
+            var customerId = (row.find("td:first-child").text());
+
+            if (confirm("Are you sure to delete this customer?")) {
+
+              var ajaxConfig = {
+                method: "DELETE",
+                url: SERVER_URL + "/api/v1/customers/" + customerId,
+                async: true
+              }
+
+              $.ajax(ajaxConfig).done(function (response, statusText, jxhr) {
+
+                $(row).remove();
+
+              }).fail(function (jxhr, statusText, error) {
+
+                console.log(jxhr.responseText);
+
+              });
+
+            }
+          });
+
+        });
+
+        $('#tblCustomers').DataTable({
+          'paging': true,
+          'lengthChange': false,
+          'searching': true,
+          'ordering': true,
+          'info': true,
+          'autoWidth': true,
+          'pageLength': 4,
+          language: {
+            search: "_INPUT_",
+            searchPlaceholder: "Search Customers..."
+          }
+        });
+
+      }).fail(function (jxhr, statusText, error) {
+        console.log(error);
+      });
+    }
+
+    function IsEmail(email) {
+      var regex = /^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+      if (!regex.test(email)) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+
+
+    function addToValidation0() {
+      var cu = $("#txtCustomerName").val();
+      if (!cu) {
+        alert("Fill the blanks")
+        return false;
+      }
+      return true;
+    }
+    function addToValidation1() {
+      var cu = $("#txtCustomerId").text();
+      if (!cu) {
+        alert("Fill the blanks")
+        return false;
+      }
+      return true;
+    }
+    function addToValidation2() {
+      var it = $("#txtCustomerAddress").val();
+      if (!it) {
+        alert("Fill the blanks")
+        return false;
+      }
+      return true;
+    }
+
+
+  </script>
+</body>
+
+</html>
